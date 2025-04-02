@@ -160,7 +160,6 @@ def identify_CL_Para_rename(taxa1, taxa2, common_leaves, paralogs):
     
     def rename(element, dict_Tree, taxa_Tree):
         pos = 0
-        print(pos)
         for copies in range(dict_Tree["Specie"].count(element)) :
                 new_ID = str(copies+1)
                 pos = dict_Tree["Specie"].index(element, pos, len(dict_Tree["Specie"]))
