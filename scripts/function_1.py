@@ -137,34 +137,52 @@ def get_paralogs(taxa_list1, taxa_list2):
 
 
 
-def get_paralogs_variant(taxa1, taxa2, common_leaves, paralogs):
+def identify_CL_Para_rename(taxa1, taxa2, common_leaves, paralogs):
     
-    dict_T1 = {"Specie":[], "Identifier":[], "Alias":[], "Distance":[]}
-    dict_T2 = {"Specie":[], "Identifier":[], "Alias":[], "Distance":[]}
+    dict_T1 = {"Specie":[], "Identifier":[], "Alias":[]}
+    dict_T2 = {"Specie":[], "Identifier":[], "Alias":[]}
     
-    for c in taxa1:
-        taxon = c.split(' ')[0]
-        gene = c.split(' ')[1]
+    for element in taxa1:
+        data = element.label.split(' ')
+        taxon = data[0]
+        gene = data[1]
         dict_T1["Specie"].append(taxon)
         dict_T1["Identifier"].append(gene)
-        dict_T1["Alias"].append(' ')
-        dict_T1["Distance"].append(0)
+        dict_T1["Alias"].append('')
     
-    for d in taxa2:
-        taxon = d.split(' ')[0]
-        gene = d.split(' ')[1]
+    for element in taxa2:
+        data = element.label.split(' ')
+        taxon = data[0]
+        gene = data[1]
         dict_T2["Specie"].append(taxon)
         dict_T2["Identifier"].append(gene)
-        dict_T2["Alias"].append(' ')
-        dict_T2["Distance"].append(0)
+        dict_T2["Alias"].append('')
+    
+    def rename(element, dict_Tree, taxa_Tree):
+        pos = 0
+        print(pos)
+        for copies in range(dict_Tree["Specie"].count(element)) :
+                new_ID = str(copies+1)
+                pos = dict_Tree["Specie"].index(element, pos, len(dict_Tree["Specie"]))
+                taxa_Tree[pos].label = element+"_"+new_ID
+                dict_Tree["Alias"][pos] = new_ID
+                pos += 1
         
-    temp_common = np.intersect1d(dict_T1["Specie"],dict_T2["Specie"])
+    temp_common = np.intersect1d(dict_T1["Specie"],dict_T2["Specie"]) 
     for element in temp_common:
+        
         if dict_T1["Specie"].count(element) == 1 and dict_T2["Specie"].count(element) == 1:
+            taxa1[dict_T1["Specie"].index(element)].label = element
+            taxa2[dict_T2["Specie"].index(element)].label = element
             common_leaves.append(element)
-        else : paralogs.append(element)
+            
+        else :
+            paralogs.append(element)
+            rename(element, dict_T1, taxa1)
+            rename(element, dict_T2, taxa2)
     
     return dict_T1, dict_T2
+
 
 def get_SumDistance(common_leaves, matrix, dic):
     sum_CL = 0
